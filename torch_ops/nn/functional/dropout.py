@@ -1,0 +1,19 @@
+import torch
+
+def dropout():
+    ...
+
+def alpha_dropout():
+    ...
+
+def feature_alpha_dropout():
+    ...
+
+def dropout1d():
+    ...
+    
+def dropout2d():
+    ...
+
+def dropout3d():
+    ...

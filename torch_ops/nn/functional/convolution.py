@@ -1,0 +1,19 @@
+import torch
+
+def conv1d():
+    ...
+
+def conv2d():
+    ...
+
+def conv3d():
+    ...
+
+def conv_transpose1d():
+    ...
+
+def conv_transpose2d():
+    ...
+    
+def conv_transpose3d():
+    ...
