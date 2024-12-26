@@ -5,3 +5,6 @@ class register_bwd_op:
     def __call__(self,fn):
         fn.bwd = self.bwd_fn
         return fn
+
+def broadcast_wrap():
+    ...

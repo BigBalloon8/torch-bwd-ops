@@ -1,10 +1,13 @@
 import torch
+import torch.nn.functional as F
 
-def threshold():
-    ...
+def threshold_bwd()
 
-def threshold_():
-    ...
+def threshold(input, threshold, value, inplace=False):
+    return F.threshold(input, threshold, value, inplace=inplace), (threshold, value)
+
+def threshold_(input, threshold, value):
+    return F.threshold(input, threshold, value, inplace=True)
 
 def relu():
     ...
