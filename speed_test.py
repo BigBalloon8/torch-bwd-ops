@@ -1,15 +1,14 @@
 import torch
-import torch_ops
-import time
+import inspect
+import ctypes
 
+def func(x,y):
+    return x + y
 
+capsule_pointer = ctypes.pythonapi.PyCapsule_GetPointer
+capsule_pointer.restype = ctypes.c_void_p  # Generic void pointer
+capsule_pointer.argtypes = [ctypes.py_object, ctypes.c_char_p]
 
-a = torch.ones(100000,10000)+1
-b = (torch.arange(10) + 1).repeat(10_000_000).reshape(10000,10000)
-
-s = time.time()
-(a**0.5)**3
-i = time.time()
-torch.pow(a, 1.5)
-f = time.time()
-print(i-s, f-i)
+if __name__ == '__main__':
+    pointer = capsule_pointer(torch.ops.aten.convolution_backward._op, b"expected_name")
+    print(hex(pointer))
