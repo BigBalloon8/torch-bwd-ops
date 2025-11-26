@@ -203,7 +203,7 @@ def inner(input, other, *, out=None):
 
 
 def inverse_bwd(dl_dout, inv_t, *, out=None):
-    return torch.chain_matmul(inv_t(), dl_dout, inv_t, out=out)
+    return torch.chain_matmul(inv_t, dl_dout, inv_t, out=out)
 
 @register_bwd_op(inverse_bwd)
 def inverse(input, *, out=None):

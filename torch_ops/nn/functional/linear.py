@@ -29,17 +29,17 @@ def linear(input, weight, bias=None):
 
 def bilinear_bwd(dl_dout, input1, input2, weight, *, out_mask=[True, True, True, True], out=[None, None, None, None]):
     if out_mask[0]:
-        dl_dinput1 = ...
+        dl_dinput1 = torch.sum(torch.vmap(lambda dldy, w_i: dldy@input2.T@w_i.T, in_dims=-1)(dl_dout, weight), dim=-1)
     else:
         dl_dinput1 = None
     
     if out_mask[1]:
-        dl_dinput2 = ...
+        dl_dinput2 = torch.sum(torch.vmap(lambda w_i, dldy: input1@w_i.T@dldy, in_dims=-1)(dl_dout, weight), dim=-1)
     else:
         dl_dinput2 = None
     
     if out_mask[2]:
-        dl_dweight = ...
+        dl_dweight = torch.vmap(lambda dl_dy_i: input1@dl_dy_i@input2.T, in_dims=-1, out_dims=0)(dl_dout)
     else:
         dl_dweight = None
     
