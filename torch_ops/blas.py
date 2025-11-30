@@ -220,8 +220,14 @@ def det(input):
     return det_A, (input, det_A)
 
 
-def logdet():
-    ...
+def logdet_bwd(dl_dout, A, det_A, *, out=None):
+    dl_ddetA = torch.div(dl_dout, det_A)
+    return det_bwd(dl_ddetA, A, det_A, out=out)
+
+@register_bwd_op(logdet_bwd)
+def logdet(input):
+    det_A, _ = det(input)
+    return torch.log(det_A) , (input, det_A)
 
 def slogdet():
     ...
@@ -382,5 +388,17 @@ def cumulative_trapezoid():
 def triangular_solve():
     ...
 
-def vdot():
-    ...
+def vdot_bwd(dl_dout, input, other, *,  out_mask=[True, True], out=[None, None]):
+    if out_mask[0]:
+        dl_dinput = torch.vdot(dl_dout, other, out=out[0])
+    else:
+        dl_dinput = None
+    if out_mask[1]:
+        dl_dother = torch.vdot(dl_dout, input, out=out[1])
+    else:
+        dl_dother = None
+    return dl_dinput, dl_dother
+
+@register_bwd_op(vdot_bwd)
+def vdot(input, other, *, out=None):
+    return torch.vdot(input, other), (input, other)    
