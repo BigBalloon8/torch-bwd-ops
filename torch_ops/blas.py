@@ -241,7 +241,7 @@ def lu_solve():
 def lu_unpack():
     ...
 
-def matmul_bwd(dl_dout, input, mat2, *, out_mask=[True, True], out=[None, None]):
+def mm_bwd(dl_dout, input, mat2, *, out_mask=[True, True], out=[None, None]):
     if out_mask[0]:
         dl_dinput = torch.matmul(dl_dout, mat2.transpose(-1,-2), out=out[0])
     else:
@@ -253,7 +253,7 @@ def matmul_bwd(dl_dout, input, mat2, *, out_mask=[True, True], out=[None, None])
         dl_dmat2 = None
     return dl_dinput, dl_dmat2
 
-@register_bwd_op(matmul_bwd)
+@register_bwd_op(mm_bwd)
 def mm(input, mat2, *, out=None):
     return torch.mm(input, mat2, out=out), (input, mat2)
     

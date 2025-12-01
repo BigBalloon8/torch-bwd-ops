@@ -1,25 +1,19 @@
 import torch
+from utils import Dim, Kth
 
-def maximum():
-    ...
 
-def minimum():
-    ...
+maximum = [(...,),(...,)]
 
-def fmax():
-    ...
+minimum = [(...,),(...,)]
 
-def fmin():
-    ...
+fmax = [(...,),(...,)]
 
-def sort():
-    ...
+fmin = [(...,),(...,)]
 
-def kthvalue():
-    ...
+sort = [(...,), Dim]
 
-def topk():
-    ...
+kthvalue = [(...,), Kth, Dim]
 
-def msort():
-    ...
+topk = [(...,), Kth, Dim]
+
+msort = [(...,)]

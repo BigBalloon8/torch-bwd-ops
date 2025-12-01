@@ -1,115 +1,38 @@
 import torch
-
 from torch_ops._wrappers import register_bwd_op
+from utils import Dim1, Indices
 
+cat = [[(...,),(...,)], Dim1]
 
-def cat_bwd(dl_dout, dim, sizes):
-    return torch.split(dl_dout, sizes, dim=dim)
+concat = cat
 
-@register_bwd_op(cat_bwd)
-def cat(tensors, dim=0, *, out=None):
-    sizes = [t.size(dim) for t in tensors]
-    return torch.cat(tensors, dim=dim, out=out), (dim, sizes)
+chunk = [(...,), -1]
 
-@register_bwd_op(cat_bwd)
-def concat(tensors, dim=0, *, out=None):
-    sizes = [t.size(dim) for t in tensors]
-    return torch.cat(tensors, dim=dim, out=out), (dim, sizes)
+dsplit = ...
 
+column_stack = ...
 
-def chunk_bwd(dl_douts, dim, *, out=None):
-    return torch.cat(dl_douts, dim=dim, out=out)
+dstack = ...
 
-@register_bwd_op(chunk_bwd)
-def chunk(input, chunks, dim=0):
-    return torch.chunk(input, chunks, dim=dim), (dim,)
+gather = [(...,), Dim1, Indices]
 
+hsplit = ...
 
-def dsplit(input, indices_or_sections):
-    #TODO implement once tensor_split is implemented as eqiv
-    ...
+hstack = ...
 
-def column_stack():
-    ...
+#TODO all the not implemented function have similar input
 
-def dstack():
-    ...
+def index_add():
+    raise NotImplementedError()
 
-def gather_backward(dl_dout, dim, index, shape, *, out=None):
-    # TODO test whether correct
-    if out is None:
-        out = torch.zeros(shape, dtype=dl_dout.dtype, device=dl_dout.device)
-    return out.scatter_(dim, index, dl_dout)
-
-@register_bwd_op(gather_backward)
-def gather(input, dim, index, *, out=None):
-    return torch.gather(input, dim, index, out=out), (dim, index, input.shape)
-
-
-def hsplit():
-    ...
-
-def hstack():
-    ...
-
-
-def index_add_bwd(dl_dout, dim, index, alpha, *, out_mask = [True, True], out=[None,None]):
-    if out_mask[0]:
-        if out[0] is not None:
-            dl_dinput = out[0].clone_(dl_dout)
-        else:
-            dl_dinput = dl_dinput
-    else:
-        dl_dinput = None
-    
-    if out_mask[1]:
-        dl_dsource = alpha*torch.index_select(dl_dout, dim, index, out=out[1])
-    else:
-        dl_dsource = None
-    return dl_dinput, dl_dsource
-
-@register_bwd_op(index_add_bwd)
-def index_add(input, dim, index, source, *, alpha=1, out=None):
-    if out is None:
-        out = input.clone()
-    else:
-        out = out.copy_(input)
-    return out.index_add_(dim, index, source, alpha=alpha), (dim, index, alpha)
-
-
-def index_copy_bwd(dl_dout, dim, index, *, out_mask = [True, True], out=[None,None]):
-    if out_mask[0]:
-        if out[0] is not None:
-            dl_dinput = out[0].clone_(dl_dout)
-        else:
-            dl_dinput = dl_dout
-        dl_dinput.index_fill_(dim, index, 0)
-    else:
-        dl_dinput = None
-    if out_mask[1]:
-        if out[1] is not None:
-            dl_dsource = out[1].clone_(dl_dout)
-        else:
-            dl_dsource = dl_dout
-        # TODO I think index can only have dim 1 need to check
-        inv_indexs = torch.tensor([i for i in range(dl_dout.size(dim)) if i not in torch.asarray(index)])
-        dl_dsource.index_fill_(dim, inv_indexs, 0)
-    else:
-        dl_dsource = None
-    return dl_dinput, dl_dsource
-
-@register_bwd_op(index_copy_bwd)
-def index_copy(input, dim, index, source, *, out=None):
-    if out is None:
-        out = input.clone()
-    else:
-        out = out.copy_(input)
-    return out.index_copy_(dim, index, source), (dim, index)
-
+def index_copy():
+    raise NotImplementedError()
 
 def index_reduce():
     ...
 
+def index_select():
+    raise NotImplementedError()
 
 def index_select_bwd(dl_dout, dim, index, shahpe, *, out=None):
     if out is None:
@@ -223,7 +146,6 @@ def split_bwd(dl_douts, dim, *, out=None):
 @register_bwd_op(split_bwd)
 def split(tensor, split_size_or_sections, dim=0):
     return torch.split(tensor, split_size_or_sections, dim=dim), (dim,)
-
 
 def squeeze_bwd(dl_dout, shape):
     return dl_dout.reshape(shape)
